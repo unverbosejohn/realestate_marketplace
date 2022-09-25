@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration</title>
+</head>
+<body>
+    <form method="post">
+        <label>Name</label><br>
+        <input name="first_name" type="text" placeholder="Enter your first name"><br><br>
+        <label>Name</label><br>
+        <input name="last_name" type="text" placeholder="Enter your last name"><br><br>
+        <label>Email {{ user_error }}</label><br>
+        <input name="username" type="email" placeholder="Enter your username"><br><br>
+        <label>Password</label><br>
+        <input name="password" type="password" placeholder="Enter desired password"><br>
+        <label>{{ pwd_error }}</label><br>
+        <input name="password_conf" type="password" placeholder="Repeat password"><br><br>
+        <label>{{ fields_error }}</label><br>
+        <input type="submit" value="Create Account"><br><br>
+    </form>
+</body>
+</html>
