@@ -14,7 +14,7 @@ class Connector:
         self.ex(query, commit=True, close=False)
 
         query = "CREATE TABLE IF NOT EXISTS users (" \
-                "   user_id INTEGER PRIMARY KEY," \
+                "   user_id INTEGER PRIMARY KEY NOT NULL UNIQUE," \
                 "   first_name varchar(45) NOT NULL," \
                 "   last_name varchar(45) NOT NULL," \
                 "   email varchar(45) NOT NULL," \
@@ -44,11 +44,10 @@ class Connector:
                 "   area INTEGER NOT NULL," \
                 "   FOREIGN KEY (avail_id) REFERENCES avail(avail_id)," \
                 "   FOREIGN KEY (loc_ID) REFERENCES locations(loc_ID)," \
-                "   FOREIGN KEY (user_id) REFERENCES users(user_id)," \
+                "   FOREIGN KEY (user_id) REFERENCES users(user_id)" \
                 ");"
         self.ex(query, commit=True)
 
-    @logger.dec(level='DEBUG')
     def ex(self, query: str, commit=False, close=True) -> list:
         """
         Executes *validated* SQL queries
@@ -65,13 +64,15 @@ class Connector:
         results = self.cur.fetchall()
         if close:
             self.close()
-        logger.log(*results)
-        return results
+        return [*results]
 
     def close(self) -> None:
         # Implicitly close cursor and connection
         self.cur.close()
         self.conn.close()
+
+
+conn = Connector(db=credentials.database)
 
 
 if __name__ == '__main__':
