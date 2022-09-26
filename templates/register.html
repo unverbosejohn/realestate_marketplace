@@ -1,10 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Registration</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% block welcome %}Εγγραφή Νέου Χρήστη{% endblock %}
+{% block content %}
+    <div class="center"></div>
     <form method="post">
         <label>Name</label><br>
         <input name="first_name" type="text" placeholder="Enter your first name"><br><br>
@@ -19,5 +16,4 @@
         <label>{{ fields_error }}</label><br>
         <input type="submit" value="Create Account"><br><br>
     </form>
-</body>
-</html>
+{% endblock %}

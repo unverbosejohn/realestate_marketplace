@@ -3,7 +3,6 @@ import usr
 import flask_bootstrap
 
 app = Flask(__name__)
-# app.secret_key = "6944262977"
 
 
 @app.route('/', methods=['GET', 'POST'])

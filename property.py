@@ -1,6 +1,6 @@
 import logger
 import db_con
-
+import data
 
 class Property:
     def __init__(self, location, price, availability, area):

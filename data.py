@@ -29,7 +29,8 @@ class Val:
 
         return text in self.valid[dtype]
 
-    def is_int(self, text) -> bool:
+    @staticmethod
+    def is_int(text) -> bool:
         if isinstance(text, int):
             return True
         try:
@@ -45,12 +46,12 @@ if __name__ == '__main__':
     test = Val()
 
     for loc in ('Αθήνα', 'Θεσσαλονίκη', 'Πάτρα', 'Ηράκλειο'):
-        assert test.validate(loc, 'location') == True
-    assert test.validate('Αθηνα', 'location') == False
+        assert test.validate(loc, 'location')
+    assert not test.validate('Αθηνα', 'location')
 
     for avail in ('ενοικίαση','πώληση'):
-        assert test.validate(avail, 'availability') == True
-    assert test.validate('ενoικίαση', 'availability') == False
+        assert test.validate(avail, 'availability')
+    assert not test.validate('ενoικίαση', 'availability')  # Character 'o' is English
 
     assert test.validate(20, 'area')
     assert test.validate('20', 'area')
