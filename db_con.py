@@ -100,3 +100,6 @@ conn = Connector(db=credentials.database)
 
 if __name__ == '__main__':
     conn = Connector(db=credentials.database)
+    assert conn.ex('SELECT * FROM avail;', close=False, fetch=True) == [(1, 'Ενοικίαση'), (2, 'Πώληση')]
+    assert conn.ex('SELECT * FROM locations;', close=True, fetch=True) == [(1, 'Αθήνα'), (2, 'Θεσσαλονίκη'), (3, 'Πάτρα'), (4, 'Ηράκλειο')]
+

@@ -17,15 +17,18 @@ logger.log(f"Availabilities set to {availability}")
 def is_int(text) -> bool:
     if isinstance(text, int):
         return True
-    try:
-        int(text)
-        return True
-    except ValueError:
-        pass
+    if not isinstance(text, float):
+        try:
+            int(text)
+            return True
+        except ValueError:
+            pass
     return False
 
 
 if __name__ == '__main__':
     assert is_int(10)
+    assert not is_int(10.5)
+    assert not is_int('10 τ.μ.')
     assert is_int('10')
     assert not is_int('text')
