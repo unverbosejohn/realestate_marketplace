@@ -21,9 +21,12 @@ def dec(*args, **kwargs):
 
 def log(*args: str, **kwargs: str) -> None:
     # Basic logger
+
     if not kwargs:
         logging.debug(*args)
     elif kwargs['level'] == 'INFO':
         logging.info(*args)
     elif kwargs['level'] == 'WARN':
         logging.warning(*args)
+    elif kwargs['level'] == 'ERROR':
+        logging.error(*args)

@@ -6,40 +6,40 @@
 }
 
 .row-content {
-    justify-content-center;
+    justify-content: center;
 }
 
 .single_col {
     align-content: center;
-    justify-content: center;
+
 }
 
 .center {
-    padding: 5px;
-    padding-top: 15px;
+    padding: 40px;
     font-size: large;
     text-align: center;
 }
 
-.row > div {
-  flex: 1;
+.row>div {
+    flex: 1;
 }
 
 .main {
     margin: 15%;
 }
 
-html, body {
-  height: 100%;
+html,
+body {
+    height: 100%;
 }
 
 .full-height {
-  height: 100%;
+    height: 100%;
 }
 
 .cont-ms {
     border-bottom: 1px solid grey;
-        align-content: center;
+    align-content: center;
     justify-content: center;
 }
 
@@ -48,18 +48,17 @@ html, body {
     padding-top: 2%;
     padding-right: 35%;
     padding-bottom: 2%;
-    justify-content-center;
+    justify-content: center;
     margin-right: -55%;
 
 }
 
-.col-rights {
-}
+.col-rights {}
 
 .cont-right {
     padding-left: 5%;
     padding-top: 2%;
-    padding-right: 5%;
+    padding-right: 0%;
     padding-bottom: 2%;
     border-left: 1px solid grey;
     justify-content-center;
@@ -71,4 +70,8 @@ html, body {
 
 .title {
     padding: 2%;
+}
+
+.btn {
+    width: 120px;
 }

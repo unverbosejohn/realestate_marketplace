@@ -1,80 +1,58 @@
 import logger
 import db_con
 import data
-
+import property
+import time
 
 class User:
-    def __init__(self, email: str, pwd: str):
-        self.email = email
-        self.pwd = pwd
-        self.first_name = None
-        self.last_name = None
-        self.table = 'users'
+    def __init__(self, user_id: int, username: str, pwd: str):
+        self.user_id = user_id
+        self.username = username
+        self.password = pwd
         self.logged_in = False
-        at_index = self.email.index('@')
-        self.safe_email = self.email[0:3] + ("*" * len(self.email[3:at_index])) + self.email[at_index:]
+        self.properties = {}
 
-    @logger.dec(level='INFO')
-    def login(self) -> bool:
-        # Authenticates the user with the provided credentials
+    def __enter__(self):
+        return self
 
-        sql_query = f'SELECT * FROM {self.table} WHERE email="{self.email}" AND password="{data.enc_pwd(self.pwd)}";'
-        results = db_con.conn.ex(sql_query)
-        logger.log(f'Login attempt: {self.safe_email}')
+    def __repr__(self):
+        return f'User connected: {self.username}'
 
-        # Assert if the credentials are correct
-        if results:
-            logger.log(f'Login Successful {results}')
-            self.first_name, self.last_name = results[0][1:3]
-            self.logged_in = True
-            return True
+    def get_properties(self):
 
-        logger.log(f'Login unsuccessful', level='DEBUG')  # TODO: add # of tries
-        return False
+        # Gets the user's properties from the db. Saved in self.properties (dict)
+        query = f'SELECT prop_id, loc_id, price, avail_id, area' \
+                f'  FROM properties' \
+                f'  WHERE user_id = "{self.user_id}";'
+        results = db_con.conn.ex(query, close=True)
 
-    @logger.dec(level='DEBUG')
-    def logout(self) -> bool:
-        # Logs out the current user
+        for result in results:
+            self.properties[result[0]] = property.Property(
+                prop_id=result[0],
+                user_id=self.user_id,
+                loc_id=result[1],
+                price=result[2],
+                avail_id=result[3],
+                area=result[4],
+                stored=True
+            )
 
-        logger.log(f'Logging out: {self.safe_email}', level='DEBUG')
-        self.email = None
-        self.pwd = None
-        self.first_name = None
-        self.last_name = None
-        self.logged_in = False
-        self.safe_email = None
-        return True  # TODO: unset variable that stores the class, or make cleanup function
+    def del_property(self, prop_id: int) -> bool:
+        # Deletes a property from self.properties dict and calls for deletion from db
 
-    @logger.dec(level='INFO')
-    def register(self) -> tuple[bool, str]:
-        # Registers a user
+        self.properties[prop_id].delete_property()
+        del self.properties[prop_id]
 
-        # Check that all values were entered
-        if self.email and self.pwd and self.first_name and self.last_name:
+        while prop_id in self.properties.keys():
+            time.sleep(0.2)
 
-            # Check if the provided email is valid
-            if not data.is_email(self.email):
-                return False, 'email'
+        return True
 
-            # Check if user already exists in the db
-            sql_query = f'SELECT email from {self.table} WHERE email="{self.email}"'
-            if db_con.conn.ex(sql_query):
-                logger.log('Registration failed, user exists', level='DEBUG')
-                return False, 'user'
 
-            # Check if the password satisfies the criteria
-            if not data.pwd_check(self.pwd):
-                return False, 'pwd'
-
-            # Create user account with provided credentials
-            sql_query = f'INSERT INTO {self.table} (first_name, last_name, email, password) VALUES ("{self.first_name}",' \
-                        f'"{self.last_name}", "{self.email}", "{data.enc_pwd(self.pwd)}");'
-            db_con.conn.ex(sql_query, commit=True)
-
-            logger.log(f'New user registration: {self.safe_email}')
-            return True, ''
-
-        return False, 'fields'
+users = []
+users.append(User(user_id=1, username='john', pwd='password'))
+users.append(User(user_id=2, username='doe', pwd='secret'))
+logger.log(f'You can connect to the frontend using login: john, pass: password')
 
 
 if __name__ == '__main__':

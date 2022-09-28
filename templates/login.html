@@ -1,20 +1,18 @@
 {% extends 'base.html' %}
 {% block welcome %}Σύνδεση στο Σύστημα{% endblock %}
 {% block content %}
-    <div class="single_col">
-        <div>
+<div class="center">
+    <div>
         <form action="" method="post">
-            <label class="field-label">Email</label><br>
-            <input name="username" type="email" placeholder="enter your username"><br><br>
-            <label>Password</label><br>
-            <input name="password" type="password" placeholder="enter your password"><br>
-            <p>{{ error }}</p>
-            <input type="submit" value="Login"><br><br>
+            <label class="field-label">Όνομα Χρήστη</label><br>
+            <input name="username" type="text" placeholder=""><br><br>
+            <label>Κωδικός πρόσβασης</label><br>
+            <input name="password" type="password" placeholder=""><br>
+            <br>
+            <input type="submit" value="Login"><br>
+            <p>{{ error }}</p><br>
+
         </form>
-        <form action="/register">
-            <label>Don't have an account?</label>
-            <input value="Register" type="submit">
-        </form>
-        </div>
     </div>
+</div>
 {% endblock %}

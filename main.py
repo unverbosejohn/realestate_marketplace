@@ -1,77 +1,168 @@
-from flask import Flask, render_template, redirect, url_for, session, request
+from flask import (
+    Flask,
+    render_template,
+    redirect,
+    url_for,
+    session,
+    request,
+    g,
+    jsonify)
 
+import json
+import property
 import usr
-import flask_bootstrap
+import logger
+import data
 
 app = Flask(__name__)
+app.secret_key = '2kF?EYjb8HCR9TKzD)XOKn=BltW=wQ'  # TODO: Change this for a production environment
+
+
+@app.before_request
+def before_request():
+    g.user = None
+
+    if 'user_id' in session:
+        user = [x for x in usr.users if x.user_id == session['user_id']][0]
+        g.user = user
 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
 
-    if request.method == 'POST' and request.form['username'] and request.form['password']:
-        if 'username' in request.form and 'password' in request.form:
-            username = request.form['username']
-            password = request.form['password']
+    if request.method == 'POST':
+        session.pop('user_id', None)
+        username = request.form['username']
+        password = request.form['password']
 
-            global user
-            user = usr.User(email=username, pwd=password)
+        if username and password:
 
-            if user.login():
-                session['logged_in'] = True
+            try:
+                global user
+                user = [u for u in usr.users if u.username == username and u.password == password][0]
+
+            except IndexError:
+                session['username'] = ''
+                return render_template('login.html', error='Λάθος Στοιχεία')
+
+            if user:
+                session['user_id'] = user.user_id
+                session['username'] = username
+                user.logged_in = True
+                user.get_properties()
                 return redirect(url_for('profile'))
-
-            else:
-                return render_template('login.html', error='Wrong Email or Password')
 
     return render_template('login.html')
 
 
-@app.route('/register', methods=['GET', 'POST'])
-def new():
-    # New user method
-    if request.method == 'POST':
-        first_name = request.form['first_name']
-        last_name = request.form['last_name']
-        username = request.form['username']
-        password = request.form['password']
-        password_conf = request.form['password_conf']
+@app.route('/getProps', methods=['POST'])
+def getProps():
+    try:
+        if user.logged_in:
+            data = {}
 
-        if password != password_conf:
-            return render_template('register.html', pwd_error='Password mismatch!')
+            for prop_id, prop in user.properties.items():
+                data[prop_id] = ', '.join(prop.listify())
+            return data
 
         else:
-            global user
-            user = usr.User(email=username, pwd=password)
-            user.first_name = first_name
-            user.last_name = last_name
-            registration = user.register()
+            return redirect(url_for('index'))
 
-            if registration[0]:
-                return redirect(url_for('profile'))
+    except NameError:
+        return redirect(url_for('index'))
 
-            elif registration[1] == 'user':
-                return render_template('register.html', user_error='Email exists!')
 
-            elif registration[1] == 'fields':
-                return render_template('register.html', fields_error='Please fill all fields')
+@app.route('/saveProp', methods=['POST'])
+def saveProp():
 
-    return render_template('register.html')
+    try:
+        if not session['user_id'] == user.user_id or not user.logged_in:
+            return redirect(url_for('index'))
+
+    except NameError:
+        return redirect(url_for('index'))
+
+    try:
+        if user.logged_in:
+            price = request.form['price']
+            city = request.form['city']
+            avail = request.form['avail']
+            area = request.form['area']
+
+            dinput = [price, city, avail, area]
+            if not all(dinput):
+                return jsonify({'err': 'Άδεια πεδία'}), 300, {'ContentType': 'application/json'}
+
+            if not all(list(map(data.is_int, dinput))):
+                return jsonify({'err': 'Μόνο αριθμητικές τιμές είναι αποδεκτές για τα πεδία:\n Τιμή, Τετραγωνικά'}), 300, {'ContentType': 'application/json'}
+
+            prop = property.Property(
+                user_id=user.user_id,
+                loc_id=city,
+                avail_id=avail,
+                price=price,
+                area=area
+            )
+            result = prop.save()
+
+            if result[0]:
+                while True:
+                    if prop.stored:
+                        user.properties[prop.prop_id] = prop
+                        break
+
+            else:
+                del prop
+                if result[1] == 0:
+                    return jsonify({'err': 'Λάθος Τιμή!'}), 300, {'ContentType': 'application/json'}
+                if result[1] == 3:
+                    return jsonify({'err': 'Λάθος Εμβαδόν'}), 300, {'ContentType': 'application/json'}
+                return 'bad data'
+            return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
+
+        else:
+            return redirect(url_for('index'))
+
+    except NameError:
+        return redirect(url_for('index'))
+
+
+@app.route('/delprop', methods=['POST'])
+def delprop():
+
+    if request.method == "POST":
+
+        try:
+            if not session['user_id'] == user.user_id or not user.logged_in:
+                return redirect(url_for('index'))
+        except NameError:
+            return redirect(url_for('index'))
+
+        del_id = request.form['del_id']
+
+        if int(del_id) not in list(user.properties.keys()):
+            return json.dumps({'success': False}), 300, {'ContentType': 'application/json'}
+
+        logger.log(f'Deleted property with id {del_id}')
+
+        return json.dumps({'success':True}), 200, {'ContentType': 'application/json'}
 
 
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
-    if session['logged_in']:
-        print(session)
-        if request.method == 'POST':
-            if request.form[''] == 'logout':
-                user.logout()
-                session['logged_in'] = False
-                print(session['logged_in'])
-                return redirect(url_for('index'))
-        return render_template('profile.html', first_name=user.first_name, last_name=user.last_name)
 
-    # return redirect(url_for('index'))
+    try:
+        if not session['user_id'] == user.user_id or not user.logged_in:
+            return redirect(url_for('index'))
+    except NameError:
+        return redirect(url_for('index'))
+
+    return render_template(
+        'profile.html',
+        user=str(g.user.username).title(),
+        cities=data.cities,
+        avail=data.availability,
+    )
 
 
 if __name__ == '__main__':

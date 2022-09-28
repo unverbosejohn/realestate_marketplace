@@ -1,41 +1,55 @@
-<!-- Maybe this will become "My listings page" -->
+{% extends 'base.html' %}
+{% block welcome %}Σύστημα διαχείρισης αγγελιών (καλώς ήλθες {{ user }}){% endblock %}
+{% block content %}
 
-
-<!DOCTYPE html>
-<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>User Profile</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>SignUp Template for Bootstrap </title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <link href="static/css/main.css" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="static/js/profile.js" defer></script>
 </head>
+
 <body>
-
     <div class="row">
-    <div class="cont-left">
-        <form method="post">
-        <label>Name</label><br>
-        <input name="first_name" type="text" placeholder="Enter your first name"><br><br>
-        <label>Name</label><br>
-        <input name="last_name" type="text" placeholder="Enter your last name"><br><br>
-        <label>Email {{ user_error }}</label><br>
-        <input name="username" type="email" placeholder="Enter your username"><br><br>
-        <label>Password</label><br>
-        <input name="password" type="password" placeholder="Enter desired password"><br>
-        <label>{{ pwd_error }}</label><br>
-        <input name="password_conf" type="password" placeholder="Repeat password"><br><br>
-        <label>{{ fields_error }}</label><br>
-        <input type="submit" value="Create Account"><br><br>
-        </form>
+        <div class="cont-left">
+            <form action="">
+                <label class="field-label">Τιμή: </label>
+                <input name="price" id="inputprice" size="10" type="text" placeholder="Εισάγετε τιμή"><br><br>
+                <label>Περιοχή: </label>
+                <SELECT name="city" id="inputcity">
+                    {% for city_id, city in cities.items() %}
+                    <OPTION value={{city_id}}>{{city}}</OPTION>
+                    {% endfor %}
+                </SELECT>
+                <br><br>
+                <label>Διαθεσιμότητα: </label>
+                <SELECT name="avail" id="inputavail">
+                    {% for avail_id, availability in avail.items() %}
+                    <OPTION value={{avail_id}}>{{availability}}</OPTION>
+                    {% endfor %}
+                </SELECT>
+                <br><br>
+                <label class="field-label">Τετραγωνικά: </label>
+                <input name="area" id="inputarea" size="10" type="text" placeholder="Εισάγετε εμβαδόν"><br>
+                <br>
+                <p id="error-message" style="color:red;"></p>
+                <button id="save" class="btn btn-sml btn-primary btn-block" type="button">Αποθήκευση</button>
+            </form>
+        </div>
+        <div class="cont-right">
+            <h3>Αγγελίες</h3>
+            <div id="items-container"></div>
+        </div>
     </div>
-    <div class="cont-right">
-        {% block content_right %}{% endblock %}
-    </div>
-    </div>
-    <h1>Hello {{ first_name }}</h1>
-
-
-        <button type="submit" value="logout">LOGOUT</button>
-    </form>
 </body>
-</html>
-
-
+{% endblock %}
