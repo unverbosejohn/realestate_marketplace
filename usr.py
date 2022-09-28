@@ -1,6 +1,5 @@
 import logger
 import db_con
-import data
 import property
 import time
 
