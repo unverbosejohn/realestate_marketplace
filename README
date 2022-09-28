@@ -1,0 +1,25 @@
+Real Estate Marketplace
+
+This is a simple backend system for a real estate marketplace. Front-End language is Greek.
+
+This implementation provides a portal for users login, view, save and delete their own listings.
+
+Functional
+    User is able to view his own listings
+    User is able to save new listings
+    On new listing a popup occurs
+    On new listing error, a popup occurs indicating which field is problematic
+    On a successful listing deletion from the db, a popup occurs and the listing gets removed from the front-end
+
+Technical
+    Python Flask implemented portal
+    Layout on HTML/CSS
+    Data transfer js/ajax
+    Data manipulation in Python
+    Data stored in sqlite
+
+Security:
+    Users must authenticate to use the portal.
+    Credentials are stored in credentials.py
+    Each user is isolated (i.e. cannot view/edit listings from other users)
+    Data is validated client-side & server-side
