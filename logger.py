@@ -5,8 +5,8 @@ level = 'DEBUG'
 
 
 def dec(*args, **kwargs):
-
     # Basic wrapper for logging
+
     def wrapper(func):
         if kwargs['level'] == 'DEBUG':
             logging.debug(func)
@@ -30,3 +30,7 @@ def log(*args: str, **kwargs: str) -> None:
         logging.warning(*args)
     elif kwargs['level'] == 'ERROR':
         logging.error(*args)
+
+
+if __name__ == '__main__':
+    pass
