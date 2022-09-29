@@ -145,6 +145,7 @@ def delprop():
         if int(del_id) not in list(user.properties.keys()):
             return json.dumps({'success': False}), 300, {'ContentType': 'application/json'}
 
+        user.del_property(int(del_id))
         logger.log(f'Deleted property with id {del_id}')
 
         return json.dumps({'success':True}), 200, {'ContentType': 'application/json'}
