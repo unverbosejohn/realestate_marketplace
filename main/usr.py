@@ -3,7 +3,17 @@ import db_con
 import property
 import time
 
+
 class User:
+    """
+    User object, stores user data
+
+    *Class functions*
+    get_properties: Fetches all user properties from the db
+    del_property: Deletes a property for the user, calls property.delete_property
+
+    """
+
     def __init__(self, user_id: int, username: str, pwd: str):
         self.user_id = user_id
         self.username = username
@@ -48,9 +58,8 @@ class User:
         return True
 
 
-users = []
-users.append(User(user_id=1, username='john', pwd='password'))
-users.append(User(user_id=2, username='doe', pwd='secret'))
+# User credentials are stored here
+users = [User(user_id=1, username='john', pwd='password'), User(user_id=2, username='doe', pwd='secret')]
 logger.log(f'You can connect to the frontend using login: john, pass: password')
 
 

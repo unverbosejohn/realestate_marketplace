@@ -9,6 +9,8 @@ class Connector:
         self.conn = None
         self.cur = None
 
+        # ** Database schema start **
+        #
         # query = "PRAGMA foreign_keys = ON;"
         # self.ex(query, commit=True, close=False)
 
@@ -49,12 +51,14 @@ class Connector:
         #         f"      (1, 'Ενοικίαση')," \
         #         f"      (2, 'Πώληση');"
         # self.ex(query, commit=True, close=True)
+        #
+        # ** Database schema end **
 
     def ex(self, query: str, commit=False, close=True, trans=False, fetch=True) -> list | None:
         """
         Executes *validated* SQL queries
         :param fetch: Should the results be returned
-        :param trans: Should the query run as part of a transaction
+        :param trans: Should the query run as part of a transaction (DEPRECATED)
         :param close: Close the connection when done. Use with care
         :param query: The *validated* query to be executed
         :param commit: Commit the query
@@ -88,9 +92,9 @@ class Connector:
 
         return [*results]
 
-
     def close(self) -> None:
         # Implicitly close cursor and connection
+
         self.cur.close()
         self.conn.close()
 

@@ -4,7 +4,7 @@ import db_con
 
 class Property:
     """
-    Basic property object.
+    Basic property object, stores property data
 
     *Class functions*
     check_data: checks that the object variables satisfy certain criteria
