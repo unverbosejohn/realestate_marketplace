@@ -3,6 +3,16 @@ import db_con
 
 
 class Property:
+    """
+    Basic property object.
+
+    *Class functions*
+    check_data: checks that the object variables satisfy certain criteria
+    save: Inserts property data in the db
+    delete_property: Deleted property data from the db
+    listify: Returns human-readable details about the property, in a list
+    """
+
     def __init__(self, user_id, prop_id=0, loc_id=0, price=0, avail_id=0, area=0, stored=False):
         self.loc_id = int(loc_id)
         self.prop_id = int(prop_id)
@@ -13,6 +23,8 @@ class Property:
         self.stored = stored
 
     def check_data(self) -> list[bool]:
+        # checks that the object variables satisfy certain criteria
+
         cases = []
 
         try:
@@ -27,7 +39,7 @@ class Property:
         return cases
 
     def save(self) -> tuple:
-        # Saves properties in the db, returns prop_id
+        # Saves properties in the db, returns [bool, prop_id]
 
         self_check = self.check_data()
 
@@ -56,7 +68,7 @@ class Property:
         return True, self.prop_id if self.prop_id else False, None
 
     def delete_property(self) -> bool:
-        # Deleted property from the database. Does not deconstruct class
+        # Delete property from the database. Does not deconstruct class
 
         if self.stored:
             sql_query = f'DELETE FROM properties WHERE prop_id = {self.prop_id};'
@@ -67,13 +79,14 @@ class Property:
 
     def listify(self) -> list[str]:
         # Returns the details of the property in a list, as strings, in human-readable format
+
         return [str(loc_ids[self.loc_id]), str(avail_ids[self.avail_id]), str(self.price) + ' ευρώ', str(self.area) + ' τ.μ.']
 
 
-# Location: Location_id dictionary
+# Location: Location_id dictionary (cities)
 locations = {location: loc_id for loc_id, location in [x for x in db_con.conn.ex('SELECT * FROM locations', close=False)]}
 
-# Location_id: Location dictionary
+# Location_id: Location dictionary (cities)
 loc_ids = {loc_id: location for location, loc_id in locations.items()}
 
 # Availability: Availability_id dictionary
