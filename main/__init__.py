@@ -1,3 +1,5 @@
+"""This module starts a web server on http://127.0.0.1:5000 a simple back-end portal for a real estate listing management system"""
+
 from flask import (
     Flask,
     render_template,
