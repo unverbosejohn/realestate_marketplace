@@ -4,6 +4,10 @@ This is a simple backend system for a real estate marketplace. Front-End languag
 
 This implementation provides a portal for users login, view, save and delete their own listings.
 
+After running __init__.py visit http://127.0.0.1:5000
+username: john
+password: password
+
 Functional
     User is able to view his own listings
     User is able to save new listings
