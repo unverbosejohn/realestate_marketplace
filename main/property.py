@@ -22,7 +22,7 @@ class Property:
         self.user_id = int(user_id)
         self.stored = stored
 
-    def check_data(self) -> list[bool]:
+    def check_data(self):
         # checks that the object variables satisfy certain criteria
 
         cases = []
@@ -57,10 +57,10 @@ class Property:
                         f'      {self.avail_id},' \
                         f'      {self.area});'
 
-            db_con.conn.ex(sql_query, trans=True, fetch=False, close=False)
+            db_con.conn.ex(sql_query, fetch=False)
             sql_query = 'SELECT seq FROM sqlite_sequence WHERE name="properties";'
 
-            self.prop_id = int(db_con.conn.ex(sql_query, fetch=True, close=True)[0][0])
+            self.prop_id = int(db_con.conn.ex(sql_query, fetch=True)[0][0])
 
             logger.log(f'Property with id {self.prop_id} saved. {self}')
             self.stored = True
@@ -71,20 +71,20 @@ class Property:
         # Delete property from the database. Does not deconstruct class
 
         if self.stored:
-            sql_query = f'DELETE FROM properties WHERE prop_id = {self.prop_id};'
-            db_con.conn.ex(sql_query, trans=True, fetch=False, close=True)
+            sql_query = 'DELETE FROM properties WHERE prop_id = ? ;'
+            db_con.conn.ex(sql_query, data=(self.prop_id,), commit=True, fetch=False)
             return True
 
         return False
 
-    def listify(self) -> list[str]:
+    def listify(self):
         # Returns the details of the property in a list, as strings, in human-readable format
 
         return [str(loc_ids[self.loc_id]), str(avail_ids[self.avail_id]), str(self.price) + ' ευρώ', str(self.area) + ' τ.μ.']
 
 
 # Location: Location_id dictionary (cities)
-locations = {location: loc_id for loc_id, location in [x for x in db_con.conn.ex('SELECT * FROM locations', close=False)]}
+locations = {location: loc_id for loc_id, location in [x for x in db_con.conn.ex('SELECT * FROM locations')]}
 
 # Location_id: Location dictionary (cities)
 loc_ids = {loc_id: location for location, loc_id in locations.items()}
