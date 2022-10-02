@@ -25,15 +25,12 @@
 }
 
 .main {
-    margin: 15%;
+    margin-left: 15%;
+    margin-right:15%
 }
 
 html,
 body {
-    height: 100%;
-}
-
-.full-height {
     height: 100%;
 }
 
