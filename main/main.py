@@ -16,6 +16,7 @@ import messages
 import usr
 import logger
 import data
+import shutil
 
 app = Flask(__name__)
 app.config['SESSION_PERMANENT'] = False
@@ -188,4 +189,7 @@ def logout():
 
 
 if __name__ == '__main__':
+    source_db = r'db/rem_auth.db'
+    dest_db = r'/tmp/rem_auth.db'
+    shutil.copyfile(source_db, dest_db)
     app.run(host='0.0.0.0')
