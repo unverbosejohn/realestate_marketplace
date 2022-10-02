@@ -6,11 +6,11 @@ types = ('location', 'availability', 'pwd', 'area', 'price')
 valid = {}
 
 sql_query = "SELECT * FROM locations;"
-cities = {id: city for id, city in [loc for loc in db_con.conn.ex(sql_query, close=False)]}
+cities = {id: city for id, city in [loc for loc in db_con.conn.ex(sql_query)]}
 logger.log(f"Valid locations set to {cities}")
 
 sql_query = "SELECT * FROM avail"
-availability = {id: avail for id, avail in [av for av in db_con.conn.ex(sql_query, close=False)]}
+availability = {id: avail for id, avail in [av for av in db_con.conn.ex(sql_query)]}
 logger.log(f"Availabilities set to {availability}")
 
 
