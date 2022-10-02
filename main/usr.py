@@ -2,6 +2,10 @@ import logger
 import db_con
 import property
 import time
+import auth
+import credentials
+from datetime import datetime
+import datetime
 
 
 class User:
@@ -14,12 +18,17 @@ class User:
 
     """
 
-    def __init__(self, user_id: int, username: str, pwd: str):
-        self.user_id = user_id
+    def __init__(self, username: str, pwd: str):
+        self.user_id = None
         self.username = username
+        self.first_name = None
+        self.last_name = None
+        self.email = None
         self.password = pwd
         self.logged_in = False
         self.properties = {}
+        self.tries = 0
+        self.last_try = None
 
     def __enter__(self):
         return self
@@ -27,13 +36,53 @@ class User:
     def __repr__(self):
         return f'User connected: {self.username}'
 
+    def login(self) -> bool:
+        # Authenticates the user with the provided credentials
+
+        # Check for number of failed attempts and throttle.
+        if self.tries > 3:
+            if datetime.datetime.now() - self.last_try < datetime.timedelta(seconds=5):
+                logger.log(f'Username {self.username} login attempt throttled.')
+                return False
+
+        sql_query = 'SELECT user_id, username, first_name, last_name, email FROM users WHERE username= ? AND password = ? ;'
+        data = (self.username, auth.enc_pwd(self.password).decode())
+
+        results = db_con.conn.ex(sql_query, data=data)
+        logger.log(f'Login attempt using username {self.username}', level='INFO')
+
+        # Assert if the credentials are correct and set user details
+        if results:
+            logger.log(f'Login Successful', level='INFO')
+            self.user_id = results[0][0]
+            self.first_name, self.last_name, self.email = results[0][2:5]
+            self.logged_in = True
+            self.tries = 0
+            self.last_try = None
+            return True
+
+        logger.log(f'Login unsuccessful', level='DEBUG')
+        self.tries += 1
+        self.last_try = datetime.datetime.now()
+        return False
+
+    def get_details(self):
+        sql_query = 'SELECT user_id, username, first_name, last_name, email FROM users WHERE username= ?;'
+        data = (self.username,)
+        results = db_con.conn.ex(sql_query, data=data)
+        self.user_id = results[0][0]
+        self.first_name, self.last_name, self.email = results[0][2:5]
+        self.logged_in = True
+        self.tries = 0
+        self.last_try = None
+
     def get_properties(self):
 
         # Gets the user's properties from the db. Saved in self.properties (dict)
         query = f'SELECT prop_id, loc_id, price, avail_id, area' \
                 f'  FROM properties' \
-                f'  WHERE user_id = "{self.user_id}";'
-        results = db_con.conn.ex(query, close=True)
+                f'  WHERE user_id = ? ;'
+        results = db_con.conn.ex(query, data=str(self.user_id))
 
         for result in results:
             self.properties[result[0]] = property.Property(
@@ -59,9 +108,14 @@ class User:
 
 
 # User credentials are stored here
-users = [User(user_id=1, username='john', pwd='password'), User(user_id=2, username='doe', pwd='secret')]
-logger.log(f'You can connect to the frontend using login: john, pass: password')
+# username = 'john'
+# password = 'password'
+
+users = [User(username='john', pwd='password'), User(username='doe', pwd='secret')]
+# logger.log(f'You can connect to the frontend using login: john, pass: password')
 
 
 if __name__ == '__main__':
-    pass
+    user01 = User(username='john', pwd='password')
+    assert user01.login()
+

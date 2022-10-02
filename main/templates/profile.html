@@ -1,24 +1,17 @@
 {% extends 'base.html' %}
 {% block welcome %}Σύστημα διαχείρισης αγγελιών (καλώς ήλθες {{ user }}){% endblock %}
 {% block content %}
-
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-
-    <title>SignUp Template for Bootstrap </title>
-
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-
     <link href="static/css/main.css" rel="stylesheet">
-
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="static/js/profile.js" defer></script>
 </head>
-
 <body>
     <div class="row">
         <div class="cont-left">
@@ -43,7 +36,8 @@
                 <input name="area" id="inputarea" size="10" type="text" placeholder="Εισάγετε εμβαδόν"><br>
                 <br>
                 <p id="error-message" style="color:red;"></p>
-                <button id="save" class="btn btn-sml btn-primary btn-block" type="button">Αποθήκευση</button>
+                <button id="save" class="btn btn-sml btn-primary btn-block" type="button">Αποθήκευση</button><br>
+                <p><a href=/logout id="logout">Αποσύνδεση</a></p>
             </form>
         </div>
         <div class="cont-right">
