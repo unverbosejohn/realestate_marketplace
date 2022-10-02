@@ -86,15 +86,14 @@ class Connector:
     def ex(self, query: str, data=None, fetch=True, commit=False):
         """
         Executes *validated* SQL queries
-        :param fetch: Should the results be returned
-        :param trans: Should the query run as part of a transaction (DEPRECATED)
-        :param close: Close the connection when done. Use with care
-        :param query: The *validated* query to be executed
-        :param commit: Commit the query
-        :return: The reply of the query (if any)
+        :param query: str: SQL query, qmark format
+        :param data: tuple: if qmark format is used, defaults None
+        :param fetch: bool: Fetch results
+        :param commit: bool Commit after execution
+        :return: Results of query
         """
 
-        logger.log(f'SQL: Executing: {query}, {data}')
+        logger.log(f'SQL: Executing: {query} {data if data else ""}')
 
         self.conn = sqlite3.connect(self.db, check_same_thread=False)
 
