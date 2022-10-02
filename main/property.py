@@ -48,17 +48,11 @@ class Property:
             return False, [i for i, x in enumerate(self_check) if not x][0]
 
         elif self.user_id and not self.stored:
-            sql_query = f'INSERT INTO properties (' \
-                        f'  user_id, loc_id, price, avail_id, area)' \
-                        f'  VALUES(' \
-                        f'      {self.user_id},' \
-                        f'      {self.loc_id},' \
-                        f'      {self.price},' \
-                        f'      {self.avail_id},' \
-                        f'      {self.area});'
+            sql_query = 'INSERT INTO PROPERTIES (user_id, loc_id, price, avail_id, area) VALUES( ?, ?, ?, ?, ?);'
+            data = (self.user_id, self.loc_id, self.price, self.avail_id, self.area)
 
-            db_con.conn.ex(sql_query, fetch=False)
-            sql_query = 'SELECT seq FROM sqlite_sequence WHERE name="properties";'
+            db_con.conn.ex(sql_query, data=data, fetch=False, commit=True)
+            sql_query = 'SELECT seq FROM sqlite_sequence WHERE name="properties" OR name="prop_bak";'
 
             self.prop_id = int(db_con.conn.ex(sql_query, fetch=True)[0][0])
 
