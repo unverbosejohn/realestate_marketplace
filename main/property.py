@@ -48,13 +48,13 @@ class Property:
             return False, [i for i, x in enumerate(self_check) if not x][0]
 
         elif self.user_id and not self.stored:
-            sql_query = 'INSERT INTO PROPERTIES (user_id, loc_id, price, avail_id, area) VALUES( ?, ?, ?, ?, ?);'
+            sql_query = 'INSERT INTO properties (user_id, loc_id, price, avail_id, area) VALUES( %s, %s, %s, %s, %s);' \
+                        'SELECT LAST_INSERT_ID()'
             data = (self.user_id, self.loc_id, self.price, self.avail_id, self.area)
+            self.prop_id = int(db_con.conn.ex(sql_query, data=data, fetch=True, close=True, commit=True))
 
-            db_con.conn.ex(sql_query, data=data, fetch=False, commit=True)
-            sql_query = 'SELECT seq FROM sqlite_sequence WHERE name="properties" OR name="prop_bak";'
-
-            self.prop_id = int(db_con.conn.ex(sql_query, fetch=True)[0][0])
+            # sql_query = ''
+            # self.prop_id = int(db_con.conn.ex(sql_query, fetch=True)[0][0])
 
             logger.log(f'Property with id {self.prop_id} saved. {self}')
             self.stored = True
@@ -65,7 +65,7 @@ class Property:
         # Delete property from the database. Does not deconstruct class
 
         if self.stored:
-            sql_query = 'DELETE FROM properties WHERE prop_id = ? ;'
+            sql_query = 'DELETE FROM properties WHERE prop_id = %s'
             db_con.conn.ex(sql_query, data=(self.prop_id,), commit=True, fetch=False)
             return True
 

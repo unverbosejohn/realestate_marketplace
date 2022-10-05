@@ -31,19 +31,18 @@ def before_request():
     try:
         if session['username']:
             logger.log(f'Session found: {session["username"]}')
-            g.user = usr.User(session.get('username'), '')
-            g.user.get_details()
-            g.user.get_properties()
-
+            g.user = usr.User(session["username"], '')
+            # g.user.get_details()
     except KeyError:
         pass
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
 
     try:
-        if session.get('user_id') and g.user.logged_in:
-            # assume the user is logged in and build user class
+        if session.get('username'):
+            # assume the user is logged in and redirect to profile
             return redirect(url_for('profile'))
 
     except AttributeError:
@@ -59,7 +58,7 @@ def index():
             if g.user.login():
                 session['username'] = g.user.username
                 session['user_id'] = g.user.user_id
-                g.user.get_properties()
+                logger.log(f'Redirecting to profile. g.user.username: {g.user.username}, g.user.user_id: {g.user.user_id}')
                 return redirect(url_for('profile'))
 
             else:
@@ -69,10 +68,29 @@ def index():
     return render_template('login.html')
 
 
+@app.route('/profile', methods=['GET', 'POST'])
+def profile():
+
+    try:
+        if not session['username'] == g.user.username:
+            logger.log(f'Redirecting to index')
+            return redirect(url_for('index'))
+    except AttributeError as err:
+        logger.log(f'AttributeError Raised: {err}')
+        return redirect(url_for('index'))
+
+    return render_template(
+        'profile.html',
+        user=str(g.user.first_name).title(),
+        cities=data.cities,
+        avail=data.availability,
+    )
+
+
 @app.route('/getProps', methods=['POST'])
 def getProps():
     try:
-        if g.user.logged_in:
+        if session['username']:
             data = {}
 
             for prop_id, prop in g.user.properties.items():
@@ -80,9 +98,11 @@ def getProps():
             return data
 
         else:
+            del session['username']
             return redirect(url_for('index'))
 
     except NameError:
+        del session['username']
         return redirect(url_for('index'))
 
 
@@ -90,10 +110,10 @@ def getProps():
 def saveProp():
 
     try:
-        if not session['user_id'] == g.user.user_id or not g.user.logged_in:
+        if not session['username']:
             return redirect(url_for('index'))
 
-    except NameError:
+    except KeyError:
         return redirect(url_for('index'))
 
     try:
@@ -163,23 +183,6 @@ def delprop():
         return json.dumps({'success':True}), 200, {'ContentType': 'application/json'}
 
 
-@app.route('/profile', methods=['GET', 'POST'])
-def profile():
-
-    try:
-        if not session['user_id'] == g.user.user_id or not g.user.logged_in:
-            return redirect(url_for('index'))
-    except AttributeError:
-        return redirect(url_for('index'))
-
-    return render_template(
-        'profile.html',
-        user=str(g.user.username).title(),
-        cities=data.cities,
-        avail=data.availability,
-    )
-
-
 @app.route('/logout')
 def logout():
     logger.log(f'Logging out {session["username"]}')
@@ -189,7 +192,4 @@ def logout():
 
 
 if __name__ == '__main__':
-    source_db = r'db/rem_auth.db'
-    dest_db = r'/tmp/rem_auth.db'
-    shutil.copyfile(source_db, dest_db)
     app.run(host='0.0.0.0')

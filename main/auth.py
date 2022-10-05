@@ -10,7 +10,6 @@ def enc_pwd(pwd: str) -> bytes:
     return bcrypt.hashpw(pwd.encode(), credentials.salt)
 
 
-@logger.dec(level='DEBUG')
 def pwd_check(pwd: str) -> bool:
     """
     Checks if the given pwd satisfies the criteria:
