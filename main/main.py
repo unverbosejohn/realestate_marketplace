@@ -9,7 +9,7 @@ from flask import (
     request,
     g,
     jsonify)
-import gunicorn
+
 import json
 import property
 import messages
